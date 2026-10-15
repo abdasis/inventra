@@ -4,21 +4,32 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+use Inventra\Api\Http\Request;
+use Inventra\Core\Auth\Auth;
 
-// Delegate /api requests to API app
+$uri = (string)parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+
+// Delegate /api requests to API app. Dibungkus IIFE supaya variabel front
+// controller API tidak bocor ke scope berkas ini.
 if (str_starts_with($uri, '/api')) {
-    require __DIR__ . '/../../api/public/index.php';
+    (static function (): void {
+        require __DIR__ . '/../../api/public/index.php';
+    })();
+
     exit;
 }
 
-// Serve static assets if running via PHP built-in server
+// Serve static assets if running via PHP built-in server. "return false" di level
+// teratas adalah kontrak router script php -S; aset statis sengaja dilayani sebelum
+// Auth::start() supaya permintaan CSS/JS tidak membuka sesi.
 $filePath = __DIR__ . $uri;
 if ($uri !== '/' && file_exists($filePath) && !is_dir($filePath)) {
     return false;
 }
 
-// Render Web UI Views
-require __DIR__ . '/../views/layout/header.php';
-require __DIR__ . '/../views/dashboard.php';
-require __DIR__ . '/../views/layout/footer.php';
+$request = Request::fromGlobals();
+
+Auth::start($request->isSecure());
+
+$router = require __DIR__ . '/../routes/web.php';
+$router->dispatch($request);

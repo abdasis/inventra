@@ -4,33 +4,32 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "php": "^8.3 || ^8.4 || ^8.5",
-        "cycle/migrations": "^4.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^11.0"
+        "php": "^8.3 || ^8.4 || ^8.5"
     },
     "autoload": {
         "psr-4": {
-            "Inventra\\Core\\": "packages/core/src/",
+            "Inventra\\Core\\": "apps/api/src/Core/",
             "Inventra\\Api\\": "apps/api/src/",
             "Inventra\\Web\\": "apps/web/src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Inventra\\Tests\\": "packages/core/tests/"
         }
     },
     "scripts": {
         "setup": [
             "@composer install",
             "@php -r \"is_file('.env') || copy('.env.example', '.env');\"",
-            "@php packages/database/migrate.php --seed"
+            "@php apps/api/database/migrate.php --seed"
         ],
         "serve": "@php -S 127.0.0.1:8090 -t apps/web/public apps/web/public/index.php",
-        "migrate": "@php packages/database/migrate.php",
-        "test": "@php packages/core/tests/run_tests.php"
+        "migrate": "@php apps/api/database/migrate.php",
+        "test": [
+            "@php apps/api/tests/run_tests.php",
+            "@php apps/api/tests/user_domain_check.php",
+            "@php apps/api/tests/contract_snapshot.php",
+            "@php apps/web/tests/page_snapshot.php",
+            "@php apps/web/tests/redirect_check.php"
+        ],
+        "test:record-contract": "@php apps/api/tests/contract_snapshot.php --record",
+        "test:record-pages": "@php apps/web/tests/page_snapshot.php --record"
     },
     "config": {
         "optimize-autoloader": true,

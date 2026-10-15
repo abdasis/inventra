@@ -103,13 +103,8 @@
           <th class="text-center" style="width: 140px;">Aksi</th>
         </tr>
       </thead>
-      <tbody id="assetsTableBody">
-        <tr>
-          <td colspan="7" class="text-center py-4 text-muted">
-            <div class="spinner-border spinner-border-sm text-primary me-2"></div> Memuat data inventaris...
-          </td>
-        </tr>
-      </tbody>
+      <!-- Baris diisi DataTables lewat app.js; keadaan kosong ditangani DataTables. -->
+      <tbody id="assetsTableBody"></tbody>
     </table>
   </div>
 </div>

@@ -14,25 +14,407 @@ body {
   min-height: 100vh;
 }
 
-/* Navbar */
+/*
+ * Header aplikasi dua baris. Permukaan terang semi-transparan agar menyatu
+ * dengan badan aplikasi yang juga terang; garis bawah tipis sebagai pemisah
+ * struktur, garis tipis kedua memisahkan baris identitas dan baris navigasi.
+ */
+.app-header {
+  background-color: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--card-border);
+  transition: box-shadow 200ms ease-out;
+}
+
+/* Elevasi baru dipasang setelah halaman digulir; kelasnya disetel dari app.js. */
+.app-header.is-scrolled {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+/*
+ * Bootstrap hanya menjadikan .container/.container-* sebagai flex row di dalam
+ * .navbar; .container-wide tidak termasuk daftar itu. Baris identitas dan baris
+ * navigasi karena itu disamakan perilakunya di sini.
+ */
+.app-header .container-wide {
+  display: flex;
+  flex-wrap: inherit;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Baris atas: brand di kiri, klaster identitas di kanan. Garis bawah tipisnya
+   menjadi pemisah terhadap baris navigasi dan membentang selebar header. */
+.app-header-top {
+  border-bottom: 1px solid var(--card-border);
+}
+
+.app-header-top .container-wide {
+  gap: 0.75rem;
+  padding-block: 0.25rem;
+  /* Sekitar 56px: kontrol 40-44px ditambah padding vertikal. */
+  min-height: 3.5rem;
+}
+
+/* Tombol aksi di baris identitas setinggi kontrol lain (40px di desktop). */
+.app-header-top .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+}
+
+/* Baris bawah: murni navigasi, tanpa padding bawah agar penanda aktif tautan
+   jatuh menempel di tepi bawah header. */
+.app-header-nav {
+  padding-block: 0;
+}
+
+.app-header-nav .container-wide {
+  /* Sekitar 48px; cukup untuk tombol toggler 44px di mobile. */
+  min-height: 3rem;
+}
+
+/*
+ * Lockup brand: kotak gradient berisi ikon di kiri, blok teks dua baris di
+ * kanan. Radius tautan 12px dengan padding 4px membuat kotak mark (radius 8px)
+ * konsentris dengan bentuk focus ring keyboard.
+ */
 .navbar-brand-modern {
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  font-size: 1.35rem;
+  color: var(--primary-color);
+  /* Bootstrap Reboot memberi underline pada semua tautan; kelas ini bukan
+     .navbar-brand, jadi aturan bawaan itu tidak berlaku di sini. */
+  text-decoration: none;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.25rem;
+  /* Hit area 44px; margin negatif menjaga tepi mark tetap rata dengan kontainer. */
+  margin-inline-start: -0.25rem;
+  border-radius: 12px;
+  transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.brand-badge {
-  font-size: 0.65rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+/* Blok teks: wordmark di atas, label sekunder di bawah, keduanya rata kiri. */
+.brand-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+/* Wordmark: kapital bertracking lega dan tebal, ukuran diturunkan agar
+   proporsional saat menjadi baris atas blok bertingkat. */
+.brand-wordmark {
+  font-size: 1.125rem;
   font-weight: 700;
-  padding: 0.2rem 0.5rem;
-  border-radius: 9999px;
-  background: #3b82f6;
+  letter-spacing: 0.07em;
+  line-height: 1.05;
+  color: var(--primary-color);
+  transition: color 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Mark: kotak 36px berlatar gradient accent dengan ikon putih di tengahnya.
+   Bayangan dalam tipis memberi kedalaman tanpa menambah noise visual. */
+.brand-mark {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-image: linear-gradient(150deg, var(--accent-color), var(--accent-hover));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
   color: #fff;
+  font-size: 1.125rem;
+  line-height: 1;
+  transition: box-shadow 200ms cubic-bezier(0.23, 1, 0.32, 1),
+              transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Label sekunder: muted selaras teks sekunder lain (.user-role), dibedakan dari
+   wordmark lewat ukuran dan jarak huruf, bukan lewat pil atau bingkai. */
+.brand-badge {
+  margin-top: 0.15rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: #64748b;
+}
+
+/* Tautan navigasi: pil tipis dengan indikator aktif dari path halaman. */
+.app-header .nav-link {
+  color: #334155;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 160ms ease-out, background-color 160ms ease-out, transform 160ms ease-out;
+}
+
+.app-header .nav-link i {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Penanda aktif hanya garis bawah 2px; tanpa bidang latar di belakang teks. */
+.app-header .nav-link.active {
+  color: var(--accent-hover);
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 0 var(--accent-color);
+}
+
+.app-header .navbar-toggler {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  transition: background-color 160ms ease-out, transform 160ms ease-out;
+}
+
+/* Pemicu menu akun: avatar inisial + nama dan peran bertingkat. */
+.app-header .user-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.3rem 0.75rem 0.3rem 0.3rem;
+  border: 1px solid var(--card-border);
+  border-radius: 9999px;
+  background-color: #ffffff;
+  color: var(--primary-color);
+  font-size: 0.875rem;
+  transition: background-color 160ms ease-out, border-color 160ms ease-out, transform 160ms ease-out;
+}
+
+.app-header .user-menu-btn::after {
+  margin-left: 0;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.user-avatar-lg {
+  width: 40px;
+  height: 40px;
+  font-size: 1rem;
+}
+
+.app-header .user-meta,
+.user-menu-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.25;
+}
+
+.app-header .user-name,
+.user-menu .user-name {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.app-header .user-role {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+/* Menu dropdown akun mengikuti tema header. */
+.user-menu {
+  min-width: 240px;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.user-menu-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 0.65rem 0.6rem;
+}
+
+.user-menu .dropdown-item {
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  color: #334155;
+  transition: background-color 160ms ease-out;
+}
+
+.user-menu .dropdown-item:active {
+  background-color: #e2e8f0;
+}
+
+.user-menu .dropdown-divider {
+  margin: 0.4rem 0.25rem;
+}
+
+/* Fokus keyboard: outline diganti, bukan dihapus. */
+.app-header .nav-link:focus-visible,
+.app-header .navbar-brand-modern:focus-visible,
+.app-header .navbar-toggler:focus-visible,
+.app-header .user-menu-btn:focus-visible,
+.user-menu .dropdown-item:focus-visible,
+.app-header .btn:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* State hover hanya untuk perangkat berpenunjuk presisi. */
+@media (hover: hover) and (pointer: fine) {
+  .app-header .nav-link:hover {
+    color: var(--accent-hover);
+    background-color: rgba(37, 99, 235, 0.06);
+  }
+
+  .app-header .navbar-brand-modern:hover .brand-mark {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 3px 10px rgba(37, 99, 235, 0.28);
+    transform: translateY(-1px);
+  }
+
+  .app-header .navbar-brand-modern:hover .brand-wordmark {
+    color: var(--accent-hover);
+  }
+
+  .app-header .user-menu-btn:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  .app-header .navbar-toggler:hover {
+    background-color: #f1f5f9;
+  }
+
+  .user-menu .dropdown-item:hover {
+    background-color: #f1f5f9;
+  }
+}
+
+.app-header .nav-link:active,
+.app-header .navbar-toggler:active,
+.app-header .user-menu-btn:active {
+  transform: scale(0.96);
+}
+
+/* Brand ditekan sedikit lebih ringan karena bidangnya lebih besar daripada pil nav. */
+.app-header .navbar-brand-modern:active {
+  transform: scale(0.97);
+}
+
+.app-header .navbar-brand-modern:active .brand-mark {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+@media (max-width: 991.98px) {
+  .app-header .nav-link {
+    padding-block: 0.7rem;
+  }
+
+  /* Target sentuh 44px untuk kontrol di baris identitas. */
+  .app-header-top .btn {
+    min-height: 44px;
+  }
+
+  .app-header .user-menu-btn {
+    min-height: 44px;
+  }
+}
+
+/*
+ * Desktop: baris navigasi menjadi baris terakhir header. Rantai flex
+ * (.container-wide > .navbar-collapse > .navbar-nav > .nav-item > .nav-link)
+ * direntangkan setinggi baris tersebut. Dengan begitu garis bawah tautan aktif
+ * jatuh persis di tepi bawah header, bersinggungan dengan border-bottom tanpa
+ * celah. Di bawah 992px rantai ini tidak berlaku agar navigasi collapse tetap
+ * berupa daftar vertikal dengan bentuk pil seperti semula.
+ */
+@media (min-width: 992px) {
+  .app-header-nav .container-wide {
+    align-items: stretch;
+    /* Sekitar 44px, tanpa padding bawah agar tidak menyisakan celah. */
+    min-height: 2.75rem;
+  }
+
+  .app-header-nav .navbar-collapse,
+  .app-header-nav .navbar-nav {
+    align-items: stretch;
+  }
+
+  .app-header-nav .nav-item {
+    display: flex;
+  }
+
+  /* Tautan setinggi penuh; latar hover ikut membentang penuh, bukan pil terpotong. */
+  .app-header-nav .nav-link {
+    padding-block: 0;
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .app-header .navbar-brand-modern {
+    gap: 0.4rem;
+  }
+
+  /* Ukuran diperkecil agar lockup tidak melebihi lebar brand sebelumnya di 375px. */
+  .brand-wordmark {
+    font-size: 0.95rem;
+  }
+
+  .brand-mark {
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-header,
+  .app-header .navbar-toggler,
+  .app-header .nav-link,
+  .app-header .user-menu-btn,
+  .user-menu .dropdown-item {
+    transition: none;
+  }
+
+  .app-header .nav-link:active,
+  .app-header .navbar-toggler:active,
+  .app-header .user-menu-btn:active {
+    transform: none;
+  }
+
+  /* Brand tetap boleh berganti warna, tapi tidak boleh bergerak. */
+  .app-header .navbar-brand-modern,
+  .app-header .navbar-brand-modern .brand-mark,
+  .app-header .navbar-brand-modern .brand-wordmark {
+    transition-property: color, box-shadow;
+  }
+
+  .app-header .navbar-brand-modern:active,
+  .app-header .navbar-brand-modern:hover .brand-mark {
+    transform: none;
+  }
 }
 
 /* Cards */
@@ -40,7 +422,7 @@ body {
   border: 1px solid var(--card-border);
   border-radius: 12px;
   background: #ffffff;
-  transition: all 0.2s ease;
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
@@ -118,7 +500,278 @@ body {
   padding: 1rem 1.5rem;
 }
 
-/* Toasts */
-.toast-container {
-  z-index: 1080;
+/* Breadcrumb */
+.breadcrumb-modern {
+  --bs-breadcrumb-divider-color: #94a3b8;
+}
+
+.breadcrumb-modern a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 160ms ease-out;
+}
+
+.breadcrumb-modern .breadcrumb-item.active {
+  color: #475569;
+  font-weight: 600;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .breadcrumb-modern a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+  }
+
+  .table-actions .btn:hover {
+    background-color: var(--bg-subtle);
+    border-color: #cbd5e1;
+  }
+}
+
+/* Aksi di dalam tabel: jaga area sentuh tetap nyaman */
+.table-actions {
+  gap: 0.35rem;
+}
+
+.table-actions .btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: transform 160ms ease-out;
+}
+
+.table-actions .btn:active {
+  transform: scale(0.96);
+}
+
+/* Halaman login */
+.login-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  background-color: var(--bg-subtle);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-size: 1.35rem;
+  color: var(--primary-color);
+}
+
+.login-card .btn {
+  transition: transform 160ms ease-out;
+}
+
+.login-card .btn:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breadcrumb-modern a,
+  .table-actions .btn,
+  .login-card .btn {
+    transition: none;
+  }
+
+  .table-actions .btn:active,
+  .login-card .btn:active {
+    transform: none;
+  }
+}
+
+/* Aksi form pengguna */
+.form-actions .btn {
+  min-height: 40px;
+  transition: transform 160ms ease-out;
+}
+
+.form-actions .btn:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form-actions .btn {
+    transition: none;
+  }
+
+  .form-actions .btn:active {
+    transform: none;
+  }
+}
+
+/* Angka dan tanggal yang berubah: lebar digit tetap agar tidak bergeser */
+.metric-value,
+.table-modern tbody td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Kontrol DataTables diselaraskan dengan tema dashboard */
+.table-responsive .dt-container {
+  color: #1e293b;
+}
+
+.table-responsive .dt-container .dt-layout-row {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin: 0;
+}
+
+.table-responsive .dt-container .dt-layout-row:first-child {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table-responsive .dt-container .dt-layout-row:last-child {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.table-responsive .dt-container .dt-info,
+.table-responsive .dt-container .dt-length,
+.table-responsive .dt-container .dt-search {
+  font-size: 0.8125rem;
+  color: #475569;
+}
+
+.table-responsive .dt-container .dt-length select,
+.table-responsive .dt-container .dt-search input {
+  min-height: 40px;
+}
+
+.table-responsive .dt-container .dt-length select {
+  min-width: 5rem;
+}
+
+/* Tombol paginasi: sasaran sentuh memadai dan angka rata */
+.table-responsive .dt-container .dt-paging .dt-paging-button,
+.table-responsive .dt-container .dt-paging .page-link {
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 160ms ease-out, color 160ms ease-out, transform 160ms ease-out;
+}
+
+.table-responsive .dt-container .dt-paging .dt-paging-button:active,
+.table-responsive .dt-container .dt-paging .page-link:active {
+  transform: scale(0.96);
+}
+
+.table-responsive .dt-container .dt-paging .current,
+.table-responsive .dt-container .dt-paging .active .page-link {
+  font-weight: 600;
+}
+
+.table-responsive .dt-container .dt-paging-button:focus-visible,
+.table-responsive .dt-container .page-link:focus-visible,
+.table-responsive .dt-container .dt-length select:focus-visible,
+.table-responsive .dt-container .dt-search input:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Indikator proses bawaan DataTables */
+.table-responsive .dt-container .dt-processing {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+/* SweetAlert2: notifikasi dan dialog konfirmasi */
+.swal2-container {
+  z-index: 1090;
+}
+
+.swal2-popup {
+  border-radius: 14px;
+  font-family: inherit;
+}
+
+.swal2-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.swal2-html-container {
+  font-size: 0.9375rem;
+}
+
+.swal2-toast {
+  font-size: 0.875rem;
+}
+
+@media (max-width: 575.98px) {
+  .table-responsive .dt-container .dt-layout-row:first-child,
+  .table-responsive .dt-container .dt-layout-row:last-child {
+    padding: 0.75rem 1rem;
+  }
+
+  .table-responsive .dt-container .dt-paging .dt-paging-button,
+  .table-responsive .dt-container .dt-paging .page-link {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .table-responsive .dt-container .dt-length select,
+  .table-responsive .dt-container .dt-search input {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-responsive .dt-container .dt-paging .dt-paging-button,
+  .table-responsive .dt-container .dt-paging .page-link {
+    transition: none;
+  }
+
+  .table-responsive .dt-container .dt-paging .dt-paging-button:active,
+  .table-responsive .dt-container .dt-paging .page-link:active {
+    transform: none;
+  }
+}
+
+/*
+ * Kontainer lebar tetap, bukan fluid: selalu terpusat dengan lebar maksimum
+ * 1280px sehingga konten tidak ikut melebar mengikuti lebar viewport.
+ */
+.container-wide {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 0.75rem;
+}
+
+@media (min-width: 576px) {
+  .container-wide {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* Padding samping diambil alih kontainer di dalamnya agar tepi nav sejajar konten. */
+.navbar-wide {
+  padding-inline: 0;
 }

@@ -1,3 +1,16 @@
+<?php
+/**
+ * Layout footer dashboard. Menutup container dan memuat skrip frontend.
+ *
+ * @var bool|null $loadUsersScript Diisi oleh view halaman pengguna agar users.js dimuat kondisional
+ */
+
+use Inventra\Core\Auth\Auth;
+use Inventra\Web\Support\View;
+
+$authUser = Auth::user();
+$actorName = (string)($authUser['name'] ?? 'Pengguna');
+?>
     </div>
   </main>
 
@@ -9,7 +22,7 @@
           <input type="hidden" name="id" id="assetId">
           <div class="modal-header">
             <h5 class="modal-title fw-bold" id="assetModalTitle">Tambah Aset Baru</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
           </div>
           <div class="modal-body p-4">
             <div class="row g-3">
@@ -74,7 +87,7 @@
           <input type="hidden" name="asset_id" id="checkoutAssetId">
           <div class="modal-header">
             <h5 class="modal-title fw-bold">Serah Terima / Pinjam Aset</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
           </div>
           <div class="modal-body p-4">
             <div class="alert alert-info py-2 small mb-3">
@@ -89,8 +102,9 @@
               <select class="form-select" name="target_location_id" id="checkoutLocation" required></select>
             </div>
             <div class="mb-3">
-              <label class="form-label small fw-semibold">Petugas Penyerah</label>
-              <input type="text" class="form-control" name="actor_name" value="Admin GA" required>
+              <label class="form-label small fw-semibold" for="checkoutActor">Petugas Penyerah</label>
+              <input type="text" class="form-control" id="checkoutActor" value="<?= View::e($actorName) ?>" disabled>
+              <small class="text-muted">Pelaku tercatat otomatis dari akun yang sedang login.</small>
             </div>
             <div class="mb-3">
               <label class="form-label small fw-semibold">Catatan Serah Terima</label>
@@ -114,7 +128,7 @@
           <input type="hidden" name="asset_id" id="checkinAssetId">
           <div class="modal-header">
             <h5 class="modal-title fw-bold">Pengembalian Aset ke Gudang</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
           </div>
           <div class="modal-body p-4">
             <div class="alert alert-warning py-2 small mb-3">
@@ -125,8 +139,9 @@
               <select class="form-select" name="return_location_id" id="checkinLocation" required></select>
             </div>
             <div class="mb-3">
-              <label class="form-label small fw-semibold">Petugas Penerima</label>
-              <input type="text" class="form-control" name="actor_name" value="Admin GA" required>
+              <label class="form-label small fw-semibold" for="checkinActor">Petugas Penerima</label>
+              <input type="text" class="form-control" id="checkinActor" value="<?= View::e($actorName) ?>" disabled>
+              <small class="text-muted">Pelaku tercatat otomatis dari akun yang sedang login.</small>
             </div>
             <div class="mb-3">
               <label class="form-label small fw-semibold">Catatan Pengembalian</label>
@@ -142,23 +157,43 @@
     </div>
   </div>
 
-  <!-- Toast Container -->
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="liveToast" class="toast align-items-center text-white bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body" id="toastMessage">Operasi berhasil dilakukan.</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>
-    </div>
-  </div>
-
   <!-- jQuery 3.7.1 (Latest Official) -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
 
   <!-- Bootstrap 5.3.8 JS Bundle (Popper included via Context7) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 
+  <!-- DataTables 3.1.4: core harus dimuat sebelum integrasi Bootstrap 5 -->
+  <script src="https://cdn.datatables.net/3.1.4/js/dataTables.js"></script>
+  <script src="https://cdn.datatables.net/3.1.4/js/dataTables.bootstrap5.js"></script>
+
+  <!-- SweetAlert2 11.26.25: notifikasi dan dialog konfirmasi -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.min.js"></script>
+
+  <script>
+    // Flag peran untuk app.js: staf tidak perlu menabrak aksi khusus administrator.
+    window.INVENTRA_IS_ADMIN = <?= Auth::isAdmin() ? 'true' : 'false' ?>;
+    // Identitas pengguna aktif untuk users.js.
+    window.INVENTRA_USER = <?= json_encode(
+        [
+            'id' => (int)Auth::id(),
+            'name' => (string)($authUser['name'] ?? ''),
+            'isAdmin' => Auth::isAdmin(),
+        ],
+        JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+    ) ?>;
+  </script>
+
   <!-- Inventra Frontend Logic -->
-  <script src="/assets/js/app.js"></script>
+  <?php
+  // Penanda versi dari waktu ubah berkas agar peramban tidak memakai salinan lama.
+  $publicDir = dirname(__DIR__, 2) . '/public';
+  ?>
+  <script src="/assets/js/app.js?v=<?= (int) @filemtime($publicDir . '/assets/js/app.js') ?>"></script>
+
+  <?php if (!empty($loadUsersScript)): ?>
+    <!-- Logika halaman kelola pengguna, hanya dimuat pada halaman user. -->
+    <script src="/assets/js/users.js?v=<?= (int) @filemtime($publicDir . '/assets/js/users.js') ?>"></script>
+  <?php endif; ?>
 </body>
 </html>

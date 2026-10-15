@@ -1,0 +1,570 @@
+{
+    "assets.index": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": [
+                {
+                    "id": "<berubah>",
+                    "asset_code": "AST-FIX-002",
+                    "name": "Kursi Ergonomis",
+                    "category_id": 1,
+                    "location_id": 2,
+                    "serial_number": "SN-99999",
+                    "purchase_date": "2026-04-01",
+                    "purchase_cost": 2500000,
+                    "status": "in_use",
+                    "condition_level": "fair",
+                    "assigned_to": "Budi",
+                    "notes": null,
+                    "created_at": "<berubah>",
+                    "updated_at": "<berubah>",
+                    "category_name": "Perangkat IT",
+                    "category_code": "CAT-IT",
+                    "location_name": "Ruang IT",
+                    "location_code": "LOC-DEV"
+                },
+                {
+                    "id": "<berubah>",
+                    "asset_code": "AST-FIX-001",
+                    "name": "Dell Latitude 7420",
+                    "category_id": 1,
+                    "location_id": 1,
+                    "serial_number": "SN-12345",
+                    "purchase_date": "2026-03-01",
+                    "purchase_cost": 15000000,
+                    "status": "available",
+                    "condition_level": "good",
+                    "assigned_to": null,
+                    "notes": "Aset contoh",
+                    "created_at": "<berubah>",
+                    "updated_at": "<berubah>",
+                    "category_name": "Perangkat IT",
+                    "category_code": "CAT-IT",
+                    "location_name": "Gudang",
+                    "location_code": "LOC-GUG"
+                }
+            ],
+            "count": 2
+        },
+        "logs": []
+    },
+    "assets.index.filtered": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": [
+                {
+                    "id": "<berubah>",
+                    "asset_code": "AST-FIX-001",
+                    "name": "Dell Latitude 7420",
+                    "category_id": 1,
+                    "location_id": 1,
+                    "serial_number": "SN-12345",
+                    "purchase_date": "2026-03-01",
+                    "purchase_cost": 15000000,
+                    "status": "available",
+                    "condition_level": "good",
+                    "assigned_to": null,
+                    "notes": "Aset contoh",
+                    "created_at": "<berubah>",
+                    "updated_at": "<berubah>",
+                    "category_name": "Perangkat IT",
+                    "category_code": "CAT-IT",
+                    "location_name": "Gudang",
+                    "location_code": "LOC-GUG"
+                }
+            ],
+            "count": 1
+        },
+        "logs": []
+    },
+    "assets.show": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "id": "<berubah>",
+                "asset_code": "AST-FIX-001",
+                "name": "Dell Latitude 7420",
+                "category_id": 1,
+                "location_id": 1,
+                "serial_number": "SN-12345",
+                "purchase_date": "2026-03-01",
+                "purchase_cost": 15000000,
+                "status": "available",
+                "condition_level": "good",
+                "assigned_to": null,
+                "notes": "Aset contoh",
+                "created_at": "<berubah>",
+                "updated_at": "<berubah>",
+                "category_name": "Perangkat IT",
+                "location_name": "Gudang"
+            }
+        },
+        "logs": []
+    },
+    "assets.show.missing": {
+        "status": 404,
+        "body": {
+            "success": false,
+            "message": "Aset tidak ditemukan"
+        },
+        "logs": []
+    },
+    "assets.store": {
+        "status": 201,
+        "body": {
+            "success": true,
+            "message": "Aset berhasil didaftarkan",
+            "data": {
+                "id": "<berubah>",
+                "asset_code": "<kode-otomatis>",
+                "name": "Laptop Uji",
+                "category_id": 1,
+                "location_id": 1,
+                "serial_number": "SN-BARU-1",
+                "purchase_date": "2026-05-01",
+                "purchase_cost": 9000000,
+                "status": "available",
+                "condition_level": "new",
+                "assigned_to": null,
+                "notes": null,
+                "created_at": "<berubah>",
+                "updated_at": "<berubah>",
+                "category_name": "Perangkat IT",
+                "location_name": "Gudang"
+            }
+        },
+        "logs": [
+            {
+                "action": "create",
+                "subject_type": "asset",
+                "subject_id": "<berubah>",
+                "description": "Menambahkan aset Laptop Uji (<kode-otomatis>)",
+                "ip_address": "127.0.0.1"
+            }
+        ]
+    },
+    "assets.store.invalid": {
+        "status": 422,
+        "body": {
+            "success": false,
+            "message": "Nama aset wajib diisi."
+        },
+        "logs": []
+    },
+    "assets.update": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "message": "Data aset berhasil diperbarui",
+            "data": {
+                "id": "<berubah>",
+                "asset_code": "<kode-otomatis>",
+                "name": "Dell Latitude 7420 (revisi)",
+                "category_id": 1,
+                "location_id": 1,
+                "serial_number": null,
+                "purchase_date": null,
+                "purchase_cost": 0,
+                "status": "maintenance",
+                "condition_level": "good",
+                "assigned_to": null,
+                "notes": null,
+                "created_at": "<berubah>",
+                "updated_at": "<berubah>",
+                "category_name": "Perangkat IT",
+                "location_name": "Gudang"
+            }
+        },
+        "logs": [
+            {
+                "action": "update",
+                "subject_type": "asset",
+                "subject_id": "<berubah>",
+                "description": "Memperbarui data aset Dell Latitude 7420 (revisi) (<kode-otomatis>)",
+                "ip_address": "127.0.0.1"
+            }
+        ]
+    },
+    "assets.destroy.staff": {
+        "status": 403,
+        "body": {
+            "success": false,
+            "message": "Anda tidak memiliki izin untuk menghapus aset."
+        },
+        "logs": []
+    },
+    "assets.destroy.missing.staff": {
+        "status": 403,
+        "body": {
+            "success": false,
+            "message": "Anda tidak memiliki izin untuk menghapus aset."
+        },
+        "logs": []
+    },
+    "assets.destroy.admin": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "message": "Aset berhasil dihapus"
+        },
+        "logs": [
+            {
+                "action": "delete",
+                "subject_type": "asset",
+                "subject_id": "<berubah>",
+                "description": "Menghapus aset Dell Latitude 7420 (AST-FIX-001)",
+                "ip_address": "127.0.0.1"
+            }
+        ]
+    },
+    "assets.checkout": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "message": "Serah terima / checkout aset berhasil",
+            "data": {
+                "id": "<berubah>",
+                "asset_code": "AST-FIX-001",
+                "name": "Dell Latitude 7420",
+                "category_id": 1,
+                "location_id": 2,
+                "serial_number": "SN-12345",
+                "purchase_date": "2026-03-01",
+                "purchase_cost": 15000000,
+                "status": "in_use",
+                "condition_level": "good",
+                "assigned_to": "Budi Santoso",
+                "notes": "Aset contoh",
+                "created_at": "<berubah>",
+                "updated_at": "<berubah>",
+                "category_name": "Perangkat IT",
+                "location_name": "Ruang IT"
+            }
+        },
+        "logs": [
+            {
+                "action": "check_out",
+                "subject_type": "asset",
+                "subject_id": "<berubah>",
+                "description": "Menyerahkan aset Dell Latitude 7420 (AST-FIX-001) kepada Budi Santoso",
+                "ip_address": "127.0.0.1"
+            }
+        ]
+    },
+    "assets.checkout.invalid": {
+        "status": 422,
+        "body": {
+            "success": false,
+            "message": "Nama penerima dan lokasi target wajib diisi"
+        },
+        "logs": []
+    },
+    "assets.checkin": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "message": "Pengembalian / checkin aset berhasil",
+            "data": {
+                "id": "<berubah>",
+                "asset_code": "AST-FIX-002",
+                "name": "Kursi Ergonomis",
+                "category_id": 1,
+                "location_id": 1,
+                "serial_number": "SN-99999",
+                "purchase_date": "2026-04-01",
+                "purchase_cost": 2500000,
+                "status": "available",
+                "condition_level": "fair",
+                "assigned_to": null,
+                "notes": null,
+                "created_at": "<berubah>",
+                "updated_at": "<berubah>",
+                "category_name": "Perangkat IT",
+                "location_name": "Gudang"
+            }
+        },
+        "logs": [
+            {
+                "action": "check_in",
+                "subject_type": "asset",
+                "subject_id": "<berubah>",
+                "description": "Menerima kembali aset Kursi Ergonomis (AST-FIX-002) ke lokasi penyimpanan",
+                "ip_address": "127.0.0.1"
+            }
+        ]
+    },
+    "assets.stats": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": {
+                "stats": {
+                    "total_assets": 2,
+                    "total_valuation": 17500000,
+                    "total_valuation_formatted": "Rp 17.500.000",
+                    "count_available": 1,
+                    "count_in_use": 1,
+                    "count_maintenance": 0,
+                    "count_disposed": 0
+                },
+                "recent_movements": []
+            }
+        },
+        "logs": []
+    },
+    "assets.categories": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": [
+                {
+                    "id": "<berubah>",
+                    "code": "CAT-IT",
+                    "name": "Perangkat IT",
+                    "description": "Laptop dan aksesoris"
+                }
+            ]
+        },
+        "logs": []
+    },
+    "assets.locations": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": [
+                {
+                    "id": "<berubah>",
+                    "code": "LOC-GUG",
+                    "name": "Gudang",
+                    "building": "A",
+                    "floor": "1"
+                },
+                {
+                    "id": "<berubah>",
+                    "code": "LOC-DEV",
+                    "name": "Ruang IT",
+                    "building": "A",
+                    "floor": "2"
+                }
+            ]
+        },
+        "logs": []
+    },
+    "users.index": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "data": [
+                {
+                    "id": "<berubah>",
+                    "name": "Admin GA",
+                    "email": "admin@kantor.id",
+                    "role": "admin",
+                    "is_active": true,
+                    "last_login_at": "<berubah>",
+                    "created_at": "<berubah>",
+                    "updated_at": "<berubah>",
+                    "role_label": "Administrator",
+                    "role_badge_class": "bg-danger-subtle text-danger border border-danger-subtle",
+                    "status_label": "Aktif",
+                    "last_login_formatted": "<berubah>"
+                },
+                {
+                    "id": "<berubah>",
+                    "name": "Staf GA",
+                    "email": "staf@kantor.id",
+                    "role": "staff",
+                    "is_active": true,
+                    "last_login_at": "<berubah>",
+                    "created_at": "<berubah>",
+                    "updated_at": "<berubah>",
+                    "role_label": "Staf",
+                    "role_badge_class": "bg-secondary-subtle text-secondary border border-secondary-subtle",
+                    "status_label": "Aktif",
+                    "last_login_formatted": "<berubah>"
+                }
+            ],
+            "count": 2
+        },
+        "logs": []
+    },
+    "users.index.staff": {
+        "status": 403,
+        "body": {
+            "success": false,
+            "message": "Anda tidak memiliki izin untuk mengelola pengguna."
+        },
+        "logs": []
+    },
+    "users.store": {
+        "status": 201,
+        "body": {
+            "success": true,
+            "message": "Pengguna baru berhasil ditambahkan.",
+            "data": {
+                "id": "<berubah>",
+                "name": "Rina Operator",
+                "email": "rina@kantor.id",
+                "role": "staff",
+                "is_active": true,
+                "last_login_at": "<berubah>",
+                "created_at": "<berubah>",
+                "updated_at": "<berubah>",
+                "role_label": "Staf",
+                "role_badge_class": "bg-secondary-subtle text-secondary border border-secondary-subtle",
+                "status_label": "Aktif",
+                "last_login_formatted": "<berubah>"
+            }
+        },
+        "logs": [
+            {
+                "action": "user.create",
+                "subject_type": "user",
+                "subject_id": "<berubah>",
+                "description": "Menambahkan pengguna Rina Operator (rina@kantor.id) dengan peran Staf",
+                "ip_address": "127.0.0.1"
+            }
+        ]
+    },
+    "users.store.invalid": {
+        "status": 422,
+        "body": {
+            "success": false,
+            "message": "Nama pengguna wajib diisi.",
+            "errors": {
+                "name": "Nama pengguna wajib diisi.",
+                "email": "Format email tidak valid.",
+                "role": "Peran pengguna tidak valid.",
+                "password": "Kata sandi minimal 8 karakter."
+            }
+        },
+        "logs": []
+    },
+    "users.update": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "message": "Data pengguna berhasil diperbarui.",
+            "data": {
+                "id": "<berubah>",
+                "name": "Staf GA Utama",
+                "email": "staf@kantor.id",
+                "role": "staff",
+                "is_active": true,
+                "last_login_at": "<berubah>",
+                "created_at": "<berubah>",
+                "updated_at": "<berubah>",
+                "role_label": "Staf",
+                "role_badge_class": "bg-secondary-subtle text-secondary border border-secondary-subtle",
+                "status_label": "Aktif",
+                "last_login_formatted": "<berubah>"
+            }
+        },
+        "logs": [
+            {
+                "action": "user.update",
+                "subject_type": "user",
+                "subject_id": "<berubah>",
+                "description": "Memperbarui data pengguna Staf GA Utama (staf@kantor.id)",
+                "ip_address": "127.0.0.1"
+            }
+        ]
+    },
+    "users.update.self-deactivate": {
+        "status": 422,
+        "body": {
+            "success": false,
+            "message": "Anda tidak dapat menonaktifkan akun Anda sendiri."
+        },
+        "logs": []
+    },
+    "users.toggle-active": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "message": "Pengguna berhasil dinonaktifkan.",
+            "data": {
+                "id": "<berubah>",
+                "name": "Staf GA",
+                "email": "staf@kantor.id",
+                "role": "staff",
+                "is_active": false,
+                "last_login_at": "<berubah>",
+                "created_at": "<berubah>",
+                "updated_at": "<berubah>",
+                "role_label": "Staf",
+                "role_badge_class": "bg-secondary-subtle text-secondary border border-secondary-subtle",
+                "status_label": "Nonaktif",
+                "last_login_formatted": "<berubah>"
+            }
+        },
+        "logs": [
+            {
+                "action": "user.deactivate",
+                "subject_type": "user",
+                "subject_id": "<berubah>",
+                "description": "Menonaktifkan pengguna Staf GA (staf@kantor.id)",
+                "ip_address": "127.0.0.1"
+            }
+        ]
+    },
+    "users.destroy": {
+        "status": 200,
+        "body": {
+            "success": true,
+            "message": "Pengguna berhasil dihapus."
+        },
+        "logs": [
+            {
+                "action": "user.delete",
+                "subject_type": "user",
+                "subject_id": "<berubah>",
+                "description": "Menghapus pengguna Staf GA (staf@kantor.id)",
+                "ip_address": "127.0.0.1"
+            }
+        ]
+    },
+    "auth.unauthenticated": {
+        "status": 401,
+        "body": {
+            "success": false,
+            "message": "Sesi tidak ditemukan atau telah berakhir. Silakan login kembali."
+        },
+        "logs": []
+    },
+    "auth.unauthenticated.post": {
+        "status": 401,
+        "body": {
+            "success": false,
+            "message": "Sesi tidak ditemukan atau telah berakhir. Silakan login kembali."
+        },
+        "logs": []
+    },
+    "csrf.invalid": {
+        "status": 403,
+        "body": {
+            "success": false,
+            "message": "Token keamanan tidak valid. Muat ulang halaman lalu coba lagi."
+        },
+        "logs": []
+    },
+    "route.not-found": {
+        "status": 404,
+        "body": {
+            "success": false,
+            "message": "Endpoint tidak ditemukan: GET /tidak-ada"
+        },
+        "logs": []
+    },
+    "route.method-mismatch": {
+        "status": 404,
+        "body": {
+            "success": false,
+            "message": "Endpoint tidak ditemukan: PATCH /assets/1"
+        },
+        "logs": []
+    }
+}
