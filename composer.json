@@ -4,7 +4,8 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "php": "^8.3 || ^8.4 || ^8.5"
+        "php": "^8.3 || ^8.4 || ^8.5",
+        "cycle/migrations": "^4.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.0"
@@ -22,7 +23,14 @@
         }
     },
     "scripts": {
-        "test": "php packages/core/tests/run_tests.php"
+        "setup": [
+            "@composer install",
+            "@php -r \"is_file('.env') || copy('.env.example', '.env');\"",
+            "@php packages/database/migrate.php --seed"
+        ],
+        "serve": "@php -S 127.0.0.1:8090 -t apps/web/public apps/web/public/index.php",
+        "migrate": "@php packages/database/migrate.php",
+        "test": "@php packages/core/tests/run_tests.php"
     },
     "config": {
         "optimize-autoloader": true,

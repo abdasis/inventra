@@ -10,7 +10,7 @@ Inventra adalah sistem manajemen inventaris dan aset kantor modern berbasis mono
 - **Frontend UI**: Bootstrap 5.3.8 (via Context7 latest jsDelivr bundle + Popper) & Bootstrap Icons 1.11.3
 - **Client Scripting**: jQuery 3.7.1 (AJAX dynamic tables, modal forms, live filters)
 - **Database**: MySQL 8.4 LTS (InnoDB, utf8mb4, relational integrity foreign keys)
-- **Dev Tooling**: Python 3 CLI runner (`manage.py`)
+- **Dev Tooling**: Composer script (`composer setup`, `composer serve`, `composer migrate`)
 
 ---
 
@@ -81,35 +81,25 @@ inventra/
 
 ## 4. Cara Menjalankan
 
-### Opsi A: Menggunakan Docker Compose (MySQL 8.4 LTS)
+Semua service dijalankan lewat Composer script (tanpa Docker).
+
 ```bash
-# 1. Salin file environment
-cp .env.example .env
+# 1. Install dependency + buat .env + migrasi + seed demo data
+composer setup
 
-# 2. Jalankan database MySQL 8.4 & App
-python3 manage.py docker up
-
-# 3. Akses aplikasi di browser
-# Web: http://localhost:8080
-# API: http://localhost:8080/api/v1/assets
+# 2. Jalankan web & API
+composer serve          # http://localhost:8090
 ```
 
-### Opsi B: Menggunakan PHP Lokal
+Perintah lain:
+
 ```bash
-# 1. Siapkan database MySQL dan konfigurasi .env
-cp .env.example .env
-
-# 2. Jalankan migrasi & seed demo data
-python3 manage.py migrate --seed
-
-# 3. Jalankan server lokal
-python3 manage.py serve --port 8080
+composer migrate                 # migrasi saja
+composer migrate -- --seed       # migrasi + seed demo data
+composer test                    # unit self-check test
 ```
 
-### Menjalankan Unit Self-Check Test
-```bash
-python3 manage.py test
-```
+Syarat: MySQL lokal aktif (service `mysql` bawaan Yerd / MySQL server biasa) dan kredensial DB di `.env` sudah sesuai.
 
 ---
 
