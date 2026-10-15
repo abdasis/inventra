@@ -29,6 +29,7 @@ final class Connection
         $username = getenv('DB_USERNAME') ?: 'root';
         $password = getenv('DB_PASSWORD') ?: '';
 
+        // SQLite fallback for offline unit tests without an external MySQL daemon
         if ($driver === 'sqlite') {
             $sqlitePath = $database === ':memory:' ? ':memory:' : __DIR__ . '/../../../../' . $database;
             $pdo = new PDO('sqlite:' . $sqlitePath);
