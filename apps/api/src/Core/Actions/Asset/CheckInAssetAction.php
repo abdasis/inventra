@@ -7,17 +7,25 @@ namespace Inventra\Core\Actions\Asset;
 use Inventra\Core\Enums\AssetStatus;
 use Inventra\Core\Exceptions\NotFoundException;
 use Inventra\Core\Exceptions\ValidationException;
+use Inventra\Core\Repositories\AssetAssignmentRepository;
 use Inventra\Core\Repositories\AssetRepository;
 
 /**
  * Pengembalian aset: aset harus ada, lokasi penyimpanan wajib terisi, status
- * kembali ke available dan pemegang dilepas. Actor diserahkan pemanggil supaya
+ * kembali ke available dan pemegang dilepas. Penempatan aktif aset ikut ditutup
+ * supaya histori pemegangnya tidak menggantung. Actor diserahkan pemanggil supaya
  * aturan ini bisa diuji tanpa konteks HTTP.
  */
 final class CheckInAssetAction
 {
-    public function __construct(private readonly AssetRepository $assets)
+    private readonly AssetRepository $assets;
+
+    private readonly AssetAssignmentRepository $assignments;
+
+    public function __construct(AssetRepository $assets, ?AssetAssignmentRepository $assignments = null)
     {
+        $this->assets = $assets;
+        $this->assignments = $assignments ?? new AssetAssignmentRepository();
     }
 
     /**
@@ -47,6 +55,15 @@ final class CheckInAssetAction
             $asset['assigned_to'] !== null ? (string)$asset['assigned_to'] : null,
             $notes
         );
+
+        $active = $this->assignments->activeForAsset($assetId);
+        if ($active !== null) {
+            $this->assignments->close((int)$active['id'], [
+                'returned_at' => date('Y-m-d H:i:s'),
+                'condition_in' => (string)$asset['condition_level'],
+                'received_by_name' => $actor,
+            ]);
+        }
 
         return $asset;
     }

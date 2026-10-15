@@ -20,12 +20,50 @@ $authRole = UserRole::tryFrom((string)($authUser['role'] ?? ''));
 // Status aktif nav ditentukan dari path yang sedang dibuka, bukan di-hardcode.
 $currentPath = (string)(parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?? '/');
 $isUsersPage = str_starts_with($currentPath, '/users');
+$isMasterPage = str_starts_with($currentPath, '/master');
+$isOpsPage = str_starts_with($currentPath, '/assignments')
+    || str_starts_with($currentPath, '/loans')
+    || str_starts_with($currentPath, '/transfers')
+    || str_starts_with($currentPath, '/maintenances')
+    || str_starts_with($currentPath, '/disposals');
+
+// Penempatan, peminjaman, mutasi, pemeliharaan, dan penghapusan dikelompokkan
+// supaya baris navigasi tetap ringkas.
+$opsLinks = [
+    ['label' => 'Penempatan Aset', 'url' => '/assignments'],
+    ['label' => 'Peminjaman Aset', 'url' => '/loans'],
+    ['label' => 'Mutasi Aset', 'url' => '/transfers'],
+    ['label' => 'Pemeliharaan Aset', 'url' => '/maintenances'],
+    ['label' => 'Penghapusan Aset', 'url' => '/disposals'],
+];
+
+// Satu pintu ke seluruh halaman master data, hanya untuk administrator.
+$masterLinks = [
+    ['label' => 'Kategori', 'url' => '/master/categories'],
+    ['label' => 'Satuan', 'url' => '/master/units'],
+    ['label' => 'Barang', 'url' => '/master/items'],
+    ['label' => 'Lokasi', 'url' => '/master/locations'],
+    ['label' => 'Karyawan', 'url' => '/master/employees'],
+    ['label' => 'Supplier', 'url' => '/master/suppliers'],
+];
 
 $navLinks = [
     ['label' => 'Dashboard & Inventaris', 'url' => '/', 'icon' => 'bi-grid-1x2', 'active' => $currentPath === '/'],
-    ['label' => 'Riwayat Mutasi', 'url' => '/#movementsSection', 'icon' => 'bi-clock-history', 'active' => false],
+    ['label' => 'Pengadaan', 'url' => '/purchases', 'icon' => 'bi-cart-plus', 'active' => str_starts_with($currentPath, '/purchases')],
+    ['label' => 'Stok Habis Pakai', 'url' => '/stock', 'icon' => 'bi-archive', 'active' => str_starts_with($currentPath, '/stock')],
+    ['label' => 'Laporan', 'url' => '/reports', 'icon' => 'bi-file-earmark-bar-graph', 'active' => str_starts_with($currentPath, '/reports')],
     ['label' => 'REST API', 'url' => '/api/v1/assets', 'icon' => 'bi-code-slash', 'active' => false, 'external' => true],
 ];
+
+// Audit trail hanya untuk administrator karena memuat jejak seluruh pengguna.
+if (Auth::isAdmin()) {
+    $navLinks[] = [
+        'label' => 'Audit Trail',
+        'url' => '/activity-logs',
+        'icon' => 'bi-shield-check',
+        'active' => str_starts_with($currentPath, '/activity-logs'),
+    ];
+}
 
 if (Auth::isAdmin()) {
     $navLinks[] = ['label' => 'Kelola Pengguna', 'url' => '/users', 'icon' => 'bi-people', 'active' => $isUsersPage];
@@ -86,9 +124,9 @@ $userInitial = mb_strtoupper(mb_substr($userName, 0, 1));
         </a>
 
         <div class="d-flex align-items-center gap-2">
-          <button class="btn btn-primary btn-sm px-3" id="btnOpenAddModal">
+          <a class="btn btn-primary btn-sm px-3" href="/assets/create">
             <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Tambah Aset
-          </button>
+          </a>
 
           <div class="dropdown">
             <button class="user-menu-btn dropdown-toggle" type="button"
@@ -142,6 +180,44 @@ $userInitial = mb_strtoupper(mb_substr($userName, 0, 1));
                 </a>
               </li>
             <?php endforeach; ?>
+
+            <li class="nav-item dropdown">
+              <button type="button" class="nav-link dropdown-toggle<?= $isOpsPage ? ' active' : '' ?>"
+                      id="navOperational" data-bs-toggle="dropdown" aria-expanded="false"<?= $isOpsPage ? ' aria-current="page"' : '' ?>>
+                <i class="bi bi-people" aria-hidden="true"></i>Operasional Aset
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="navOperational">
+                <?php foreach ($opsLinks as $opsLink): ?>
+                  <?php $isOpsLinkActive = $currentPath === $opsLink['url']; ?>
+                  <li>
+                    <a class="dropdown-item<?= $isOpsLinkActive ? ' active' : '' ?>"
+                       href="<?= View::e((string)$opsLink['url']) ?>"<?= $isOpsLinkActive ? ' aria-current="page"' : '' ?>>
+                      <?= View::e((string)$opsLink['label']) ?>
+                    </a>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            </li>
+
+            <?php if (Auth::isAdmin()): ?>
+              <li class="nav-item dropdown">
+                <button type="button" class="nav-link dropdown-toggle<?= $isMasterPage ? ' active' : '' ?>"
+                        id="navMasterData" data-bs-toggle="dropdown" aria-expanded="false"<?= $isMasterPage ? ' aria-current="page"' : '' ?>>
+                  <i class="bi bi-diagram-3" aria-hidden="true"></i>Master Data
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="navMasterData">
+                  <?php foreach ($masterLinks as $masterLink): ?>
+                    <?php $isMasterActive = $currentPath === $masterLink['url']; ?>
+                    <li>
+                      <a class="dropdown-item<?= $isMasterActive ? ' active' : '' ?>"
+                         href="<?= View::e((string)$masterLink['url']) ?>"<?= $isMasterActive ? ' aria-current="page"' : '' ?>>
+                        <?= View::e((string)$masterLink['label']) ?>
+                      </a>
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              </li>
+            <?php endif; ?>
           </ul>
         </div>
       </div>

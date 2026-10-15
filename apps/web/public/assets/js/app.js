@@ -132,6 +132,18 @@ $(document).ready(function () {
     /** Ubah rangkaian markup <tr> menjadi baris siap ditambahkan ke DataTables. */
     rowsFromHtml: function (html) {
       return $($.parseHTML('<table><tbody>' + html + '</tbody></table>')).find('tr');
+    },
+
+    /** Label lokasi seragam untuk dropdown di seluruh halaman. */
+    locationLabel: function (location) {
+      const row = location || {};
+      const parts = [row.building, row.floor].filter(function (part) {
+        return part !== null && part !== undefined && String(part).trim() !== '';
+      });
+
+      return parts.length
+        ? parts.join(' - ') + ' (' + String(row.name || '') + ')'
+        : String(row.name || '');
     }
   };
 
@@ -155,13 +167,10 @@ $(document).ready(function () {
   const isAdmin = window.INVENTRA_IS_ADMIN === true;
   const escapeHtml = window.InventraUI.escapeHtml;
 
-  let categoriesCache = [];
-  let locationsCache = [];
   let searchTimer = null;
   let assetsTable = null;
 
-  // Bootstrap Modals
-  const assetModal = new bootstrap.Modal($('#assetModal')[0]);
+  // Bootstrap Modals untuk serah terima dan pengembalian aset.
   const checkoutModal = new bootstrap.Modal($('#checkoutModal')[0]);
   const checkinModal = new bootstrap.Modal($('#checkinModal')[0]);
 
@@ -199,33 +208,27 @@ $(document).ready(function () {
   function loadCategories() {
     return $.getJSON(`${API_BASE}/categories`, function (res) {
       if (res.success && Array.isArray(res.data)) {
-        categoriesCache = res.data;
         let filterOpts = '<option value="">Semua Kategori</option>';
-        let formOpts = '<option value="">-- Pilih Kategori --</option>';
 
         res.data.forEach(function (cat) {
           filterOpts += `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)}</option>`;
-          formOpts += `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)}</option>`;
         });
 
         $('#filterCategory').html(filterOpts);
-        $('#selectCategory').html(formOpts);
       }
     });
   }
 
-  // 2. Load Locations
+  // 2. Load Locations untuk dropdown pada modal serah terima dan pengembalian.
   function loadLocations() {
     return $.getJSON(`${API_BASE}/locations`, function (res) {
       if (res.success && Array.isArray(res.data)) {
-        locationsCache = res.data;
         let formOpts = '<option value="">-- Pilih Lokasi Penempatan --</option>';
 
         res.data.forEach(function (loc) {
-          formOpts += `<option value="${escapeHtml(loc.id)}">${escapeHtml(loc.building)} - ${escapeHtml(loc.floor)} (${escapeHtml(loc.name)})</option>`;
+          formOpts += `<option value="${escapeHtml(loc.id)}">${escapeHtml(window.InventraUI.locationLabel(loc))}</option>`;
         });
 
-        $('#selectLocation').html(formOpts);
         $('#checkoutLocation').html(formOpts);
         $('#checkinLocation').html(formOpts);
       }
@@ -349,13 +352,19 @@ $(document).ready(function () {
 
       // Aksi hapus khusus administrator, sembunyikan agar staf tidak menabrak 403.
       const deleteBtn = isAdmin
-        ? `<button class="btn btn-sm btn-light border py-0 px-2 text-danger btn-delete" data-id="${escapeHtml(a.id)}" data-name="${escapeHtml(a.name)}" title="Hapus"><i class="bi bi-trash"></i></button>`
+        ? `<button class="btn btn-sm btn-light border py-0 px-2 text-danger btn-delete" data-id="${escapeHtml(a.id)}" data-name="${escapeHtml(a.name)}" title="Hapus" aria-label="Hapus ${escapeHtml(a.name)}"><i class="bi bi-trash"></i></button>`
+        : '';
+
+      // Jenis barang ditampilkan sebagai baris sekunder bila aset terkait barang master.
+      const itemLine = a.item_name
+        ? `<div class="small text-muted">${escapeHtml(a.item_name)}</div>`
         : '';
 
       rows += `
         <tr data-id="${escapeHtml(a.id)}">
           <td>
             <div class="fw-bold text-dark">${escapeHtml(a.name)}</div>
+            ${itemLine}
             <div class="small text-muted font-monospace"><i class="bi bi-upc-scan me-1"></i>${escapeHtml(a.asset_code)}</div>
             ${a.serial_number ? `<small class="text-muted d-block">S/N: ${escapeHtml(a.serial_number)}</small>` : ''}
           </td>
@@ -374,7 +383,8 @@ $(document).ready(function () {
           <td class="text-center">
             <div class="d-inline-flex gap-1 align-items-center">
               ${checkoutBtn}
-              <button class="btn btn-sm btn-light border py-0 px-2 btn-edit" data-id="${escapeHtml(a.id)}" title="Edit"><i class="bi bi-pencil"></i></button>
+              <a class="btn btn-sm btn-light border py-0 px-2" href="/assets/${escapeHtml(a.id)}" title="Lihat detail" aria-label="Lihat detail ${escapeHtml(a.name)}"><i class="bi bi-eye"></i></a>
+              <a class="btn btn-sm btn-light border py-0 px-2" href="/assets/${escapeHtml(a.id)}/edit" title="Ubah" aria-label="Ubah ${escapeHtml(a.name)}"><i class="bi bi-pencil"></i></a>
               ${deleteBtn}
             </div>
           </td>
@@ -407,82 +417,8 @@ $(document).ready(function () {
     loadAssets();
   });
 
-  // 6. Open Modal Tambah Aset
-  $('#btnOpenAddModal').on('click', function () {
-    $('#formAsset')[0].reset();
-    $('#assetId').val('');
-    $('#assetModalTitle').text('Tambah Aset Baru');
-    assetModal.show();
-  });
-
-  // 7. Submit Form Aset (Create / Update)
-  $('#formAsset').on('submit', function (e) {
-    e.preventDefault();
-    const id = $('#assetId').val();
-    const isEdit = !!id;
-
-    const payload = {
-      asset_code: $('#inputAssetCode').val().trim(),
-      name: $('#inputAssetName').val().trim(),
-      category_id: parseInt($('#selectCategory').val(), 10),
-      location_id: parseInt($('#selectLocation').val(), 10),
-      serial_number: $('#inputSerialNumber').val().trim(),
-      purchase_date: $('#inputPurchaseDate').val() || null,
-      purchase_cost: parseFloat($('#inputPurchaseCost').val()) || 0,
-      condition_level: $('#selectCondition').val(),
-      notes: $('#inputNotes').val().trim()
-    };
-
-    const url = isEdit ? `${API_BASE}/assets/${id}` : `${API_BASE}/assets`;
-    const method = isEdit ? 'PUT' : 'POST';
-
-    $.ajax({
-      url: url,
-      type: method,
-      contentType: 'application/json',
-      data: JSON.stringify(payload),
-      success: function (res) {
-        if (res.success) {
-          assetModal.hide();
-          showToast(res.message);
-          loadAssets();
-          loadStats();
-        } else {
-          showToast(res.message || 'Gagal menyimpan aset', true);
-        }
-      },
-      error: function (xhr) {
-        const res = xhr.responseJSON;
-        showToast(res && res.message ? res.message : 'Terjadi kesalahan sistem', true);
-      }
-    });
-  });
-
-  // 8. Edit Asset
-  $(document).on('click', '.btn-edit', function () {
-    const id = $(this).data('id');
-    $.getJSON(`${API_BASE}/assets/${id}`, function (res) {
-      if (res.success && res.data) {
-        const a = res.data;
-        $('#assetId').val(a.id);
-        $('#inputAssetCode').val(a.asset_code);
-        $('#inputAssetName').val(a.name);
-        $('#selectCategory').val(a.category_id);
-        $('#selectLocation').val(a.location_id);
-        $('#inputSerialNumber').val(a.serial_number || '');
-        $('#inputPurchaseDate').val(a.purchase_date || '');
-        $('#inputPurchaseCost').val(a.purchase_cost);
-        $('#selectCondition').val(a.condition_level);
-        $('#inputNotes').val(a.notes || '');
-
-        $('#assetModalTitle').text('Edit Aset: ' + a.name);
-        assetModal.show();
-      }
-    });
-  });
-
-  // 9. Delete Asset
-  $(document).on('click', '.btn-delete', function () {
+  // 6. Check-out Asset Modal
+  $(document).on('click', '.btn-checkout', function () {
     const id = $(this).data('id');
     const name = $(this).data('name');
 
@@ -515,7 +451,7 @@ $(document).ready(function () {
     });
   });
 
-  // 10. Check-out Asset Modal
+  // 7. Check-out Asset Modal
   $(document).on('click', '.btn-checkout', function () {
     const id = $(this).data('id');
     const name = $(this).data('name');
@@ -559,7 +495,7 @@ $(document).ready(function () {
     });
   });
 
-  // 11. Check-in Asset Modal
+  // 8. Check-in Asset Modal
   $(document).on('click', '.btn-checkin', function () {
     const id = $(this).data('id');
     const name = $(this).data('name');
@@ -600,6 +536,18 @@ $(document).ready(function () {
       }
     });
   });
+
+  // 9. Pesan hasil simpan atau hapus dari halaman form/detail aset dititipkan
+  // lewat sessionStorage sebelum pengguna kembali ke dashboard.
+  try {
+    const assetFlash = sessionStorage.getItem('inventra.assets.flash');
+    if (assetFlash) {
+      sessionStorage.removeItem('inventra.assets.flash');
+      showToast(assetFlash);
+    }
+  } catch (error) {
+    // Penyimpanan sesi tidak tersedia.
+  }
 
   // Init sequence: tiap permintaan berdiri sendiri agar satu kegagalan
   // tidak memblokir pemuatan bagian dashboard lainnya.

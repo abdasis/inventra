@@ -48,6 +48,22 @@ final class Response
     }
 
     /**
+     * Unduhan berkas mentah. Ekspor CSV tidak bisa memakai envelope JSON, jadi
+     * ini satu-satunya jalur transport di luar JSON yang dilayani modul laporan.
+     */
+    public static function download(
+        string $filename,
+        string $content,
+        string $contentType = 'text/csv; charset=utf-8'
+    ): void {
+        http_response_code(200);
+        header('Content-Type: ' . $contentType);
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        echo $content;
+        exit;
+    }
+
+    /**
      * @param array<string, mixed> $payload
      */
     public static function send(int $status, array $payload): void

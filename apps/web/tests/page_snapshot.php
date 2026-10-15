@@ -43,6 +43,66 @@ $scenarios = [
     'login.post.open-redirect' => ['method' => 'POST', 'uri' => '/login', 'csrf' => true,
         'payload' => ['email' => 'admin@kantor.id', 'password' => 'Inventra#2026', 'next' => '//jahat.example']],
     'logout.post' => ['method' => 'POST', 'uri' => '/logout', 'actor' => $admin, 'csrf' => true],
+    // Laporan terbuka untuk semua pengguna; audit trail hanya administrator.
+    'page.reports.index' => ['method' => 'GET', 'uri' => '/reports', 'actor' => $admin],
+    'page.reports.index.staff' => ['method' => 'GET', 'uri' => '/reports', 'actor' => $staff],
+    'page.reports.print' => ['method' => 'GET', 'uri' => '/reports/print', 'actor' => $admin],
+    'page.activity-logs.index' => ['method' => 'GET', 'uri' => '/activity-logs', 'actor' => $admin],
+    'page.activity-logs.staff' => ['method' => 'GET', 'uri' => '/activity-logs', 'actor' => $staff],
+    'page.activity-logs.unauthenticated' => ['method' => 'GET', 'uri' => '/activity-logs'],
+
+    // Mutasi, pemeliharaan, dan penghapusan aset.
+    'page.transfers.index' => ['method' => 'GET', 'uri' => '/transfers', 'actor' => $admin],
+    'page.transfers.index.staff' => ['method' => 'GET', 'uri' => '/transfers', 'actor' => $staff],
+    'page.maintenances.index' => ['method' => 'GET', 'uri' => '/maintenances', 'actor' => $admin],
+    'page.maintenances.create' => ['method' => 'GET', 'uri' => '/maintenances/create', 'actor' => $admin],
+    'page.disposals.index' => ['method' => 'GET', 'uri' => '/disposals', 'actor' => $admin],
+    'page.disposals.create' => ['method' => 'GET', 'uri' => '/disposals/create', 'actor' => $admin],
+    'page.disposals.create.staff' => ['method' => 'GET', 'uri' => '/disposals/create', 'actor' => $staff],
+
+    // Operasional aset: staf boleh melihat daftar, tulis penempatan khusus administrator.
+    'page.assignments.index' => ['method' => 'GET', 'uri' => '/assignments', 'actor' => $admin],
+    'page.assignments.index.staff' => ['method' => 'GET', 'uri' => '/assignments', 'actor' => $staff],
+    'page.loans.index' => ['method' => 'GET', 'uri' => '/loans', 'actor' => $admin],
+    'page.loans.index.staff' => ['method' => 'GET', 'uri' => '/loans', 'actor' => $staff],
+    'page.loans.unauthenticated' => ['method' => 'GET', 'uri' => '/loans'],
+
+    // Pengadaan dan stok: staf boleh membuka (read-only untuk pengadaan), sedangkan
+    // pencatatan stok adalah operasi operasional.
+    'page.purchases.index' => ['method' => 'GET', 'uri' => '/purchases', 'actor' => $admin],
+    'page.purchases.create' => ['method' => 'GET', 'uri' => '/purchases/create', 'actor' => $admin],
+    'page.purchases.edit' => ['method' => 'GET', 'uri' => '/purchases/1/edit', 'actor' => $admin],
+    'page.purchases.detail' => ['method' => 'GET', 'uri' => '/purchases/1', 'actor' => $admin],
+    'page.purchases.index.staff' => ['method' => 'GET', 'uri' => '/purchases', 'actor' => $staff],
+    'page.purchases.unauthenticated' => ['method' => 'GET', 'uri' => '/purchases'],
+    'page.stock.index' => ['method' => 'GET', 'uri' => '/stock', 'actor' => $admin],
+    'page.stock.index.staff' => ['method' => 'GET', 'uri' => '/stock', 'actor' => $staff],
+
+    // Registrasi aset: form pindah ke halaman penuh (fieldnya lebih dari lima),
+    // ditambah halaman detail dengan riwayat dan halaman label QR untuk dicetak.
+    'page.asset.create' => ['method' => 'GET', 'uri' => '/assets/create', 'actor' => $admin],
+    'page.asset.create.staff' => ['method' => 'GET', 'uri' => '/assets/create', 'actor' => $staff],
+    'page.asset.edit' => ['method' => 'GET', 'uri' => '/assets/1/edit', 'actor' => $admin],
+    'page.asset.detail' => ['method' => 'GET', 'uri' => '/assets/1', 'actor' => $admin],
+    'page.asset.label' => ['method' => 'GET', 'uri' => '/assets/1/label', 'actor' => $admin],
+    'page.asset.create.unauthenticated' => ['method' => 'GET', 'uri' => '/assets/create'],
+
+    // Halaman master data: shell saja, isinya lewat AJAX. Hanya administrator.
+    'page.master.categories' => ['method' => 'GET', 'uri' => '/master/categories', 'actor' => $admin],
+    'page.master.units' => ['method' => 'GET', 'uri' => '/master/units', 'actor' => $admin],
+    'page.master.items' => ['method' => 'GET', 'uri' => '/master/items', 'actor' => $admin],
+    'page.master.locations' => ['method' => 'GET', 'uri' => '/master/locations', 'actor' => $admin],
+    'page.master.employees' => ['method' => 'GET', 'uri' => '/master/employees', 'actor' => $admin],
+    'page.master.suppliers' => ['method' => 'GET', 'uri' => '/master/suppliers', 'actor' => $admin],
+    'page.master.item.create' => ['method' => 'GET', 'uri' => '/master/items/create', 'actor' => $admin],
+    'page.master.item.edit' => ['method' => 'GET', 'uri' => '/master/items/1/edit', 'actor' => $admin],
+    'page.master.employee.create' => ['method' => 'GET', 'uri' => '/master/employees/create', 'actor' => $admin],
+    'page.master.employee.edit' => ['method' => 'GET', 'uri' => '/master/employees/1/edit', 'actor' => $admin],
+    'page.master.supplier.create' => ['method' => 'GET', 'uri' => '/master/suppliers/create', 'actor' => $admin],
+    'page.master.supplier.edit' => ['method' => 'GET', 'uri' => '/master/suppliers/1/edit', 'actor' => $admin],
+    'page.master.staff' => ['method' => 'GET', 'uri' => '/master/items', 'actor' => $staff],
+    'page.master.unauthenticated' => ['method' => 'GET', 'uri' => '/master/items'],
+
     // Hanya /login dan /logout yang menghasilkan 405 untuk method salah.
     'page.logout.get' => ['method' => 'GET', 'uri' => '/logout', 'actor' => $admin],
     'page.login' => ['method' => 'GET', 'uri' => '/login'],

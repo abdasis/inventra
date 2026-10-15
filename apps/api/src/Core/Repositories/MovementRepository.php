@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Inventra\Core\Repositories;
 
 use Inventra\Core\Database\Connection;
+use Inventra\Core\Enums\MovementType;
 use PDO;
 
 final class MovementRepository
@@ -39,6 +40,36 @@ final class MovementRepository
         $stmt->bindValue(1, $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Riwayat pergerakan satu aset untuk halaman detail, terbaru dulu.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function forAsset(int $assetId): array
+    {
+        $sql = '
+            SELECT
+                m.id, m.asset_id, m.movement_type, m.from_location_id, m.to_location_id,
+                m.actor_name, m.recipient_name, m.notes, m.created_at,
+                lf.name AS from_location_name,
+                lt.name AS to_location_name
+            FROM asset_movements m
+            LEFT JOIN locations lf ON m.from_location_id = lf.id
+            LEFT JOIN locations lt ON m.to_location_id = lt.id
+            WHERE m.asset_id = ?
+            ORDER BY m.created_at DESC, m.id DESC
+        ';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$assetId]);
+
+        return array_map(static function (array $row): array {
+            $type = MovementType::tryFrom((string)$row['movement_type']);
+            $row['movement_label'] = $type !== null ? $type->label() : (string)$row['movement_type'];
+
+            return $row;
+        }, $stmt->fetchAll());
     }
 
     /**

@@ -775,3 +775,319 @@ body {
 .navbar-wide {
   padding-inline: 0;
 }
+
+/*
+ * Dropdown "Master Data" pada baris navigasi. Pemicunya tombol agar dapat
+ * dijangkau dengan Enter maupun Spasi, tetapi tampil sebagai tautan nav biasa.
+ */
+.app-header .nav-link.dropdown-toggle {
+  background-color: transparent;
+  border: 0;
+}
+
+.app-header-nav .dropdown-menu {
+  min-width: 208px;
+  margin-top: 0;
+  padding: 0.375rem;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* Radius item = radius menu dikurangi padding menu, supaya sudutnya konsentris. */
+.app-header-nav .dropdown-menu .dropdown-item {
+  border-radius: 6px;
+  padding: 0.5rem 0.65rem;
+  color: #334155;
+  transition: background-color 160ms cubic-bezier(0.23, 1, 0.32, 1),
+              color 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.app-header-nav .dropdown-menu .dropdown-item.active,
+.app-header-nav .dropdown-menu .dropdown-item:active {
+  background-color: rgba(37, 99, 235, 0.08);
+  color: var(--accent-hover);
+  font-weight: 600;
+}
+
+.app-header-nav .dropdown-menu .dropdown-item:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .app-header-nav .dropdown-menu .dropdown-item:hover {
+    background-color: #f1f5f9;
+  }
+}
+
+/* Di layar kecil menu mengalir mengikuti daftar nav vertikal, tanpa kartu sendiri. */
+@media (max-width: 991.98px) {
+  .app-header-nav .dropdown-menu {
+    padding-block: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .app-header-nav .dropdown-menu .dropdown-item {
+    padding-block: 0.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-header-nav .dropdown-menu .dropdown-item {
+    transition: none;
+  }
+}
+
+/*
+ * Penyelesaian tipografi: teks pada latar terang dirender lebih halus, judul
+ * kartu dibungkus seimbang, dan label penjelas mengalir lebih rapi.
+ */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.card-header h5 {
+  text-wrap: balance;
+}
+
+.card-header small,
+.card-body small.text-muted {
+  text-wrap: pretty;
+}
+
+/*
+ * Permukaan baru: aksi pada halaman detail aset dan catatan panjang pada kartu
+ * identitas. Penekanan tombol dibuat lembut dan hanya berjalan saat perangkat
+ * mendukung gerak, mengikuti pola tombol form yang sudah ada.
+ */
+.detail-actions .btn {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.detail-actions .btn:active {
+  transform: scale(0.97);
+}
+
+.detail-note {
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detail-actions .btn {
+    transition: none;
+  }
+
+  .detail-actions .btn:active {
+    transform: none;
+  }
+}
+
+/*
+ * Halaman stok: penekanan tombol kartu dan modal dibuat lembut mengikuti pola
+ * tombol form yang sudah ada. Tombol aksi di dalam tabel tidak disertakan
+ * karena sudah diatur oleh .table-actions.
+ */
+#btnAddMovement,
+#btnResetMovementFilter,
+#stockMovementModal .modal-footer .btn {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#btnAddMovement:active,
+#btnResetMovementFilter:active,
+#stockMovementModal .modal-footer .btn:active {
+  transform: scale(0.97);
+}
+
+/* Kolom alasan dan catatan pada tabel riwayat mengalir lebih rapi. */
+.stock-reason,
+.stock-note {
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #btnAddMovement,
+  #btnResetMovementFilter,
+  #stockMovementModal .modal-footer .btn {
+    transition: none;
+  }
+
+  #btnAddMovement:active,
+  #btnResetMovementFilter:active,
+  #stockMovementModal .modal-footer .btn:active {
+    transform: none;
+  }
+}
+
+/*
+ * Baris dinamis pembelian (form) dan form penerimaan (detail). Input tetap
+ * ringkas di dalam sel tabel dan angkanya rata kanan agar mudah dibandingkan
+ * antar baris; penekanan tombol mengikuti pola halaman detail aset.
+ */
+.purchase-lines td,
+.purchase-receive td {
+  padding-block: 0.5rem;
+}
+
+.purchase-lines .form-control-sm,
+.purchase-lines .form-select-sm,
+.purchase-receive .form-control-sm {
+  min-height: 40px;
+}
+
+.purchase-qty-input,
+.purchase-price-input {
+  max-width: 10rem;
+}
+
+.purchase-lines .btn,
+.purchase-receive .btn {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.purchase-lines .btn:active,
+.purchase-receive .btn:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .purchase-lines .btn,
+  .purchase-receive .btn {
+    transition: none;
+  }
+
+  .purchase-lines .btn:active,
+  .purchase-receive .btn:active {
+    transform: none;
+  }
+}
+
+/* Angka total pembelian pada kaki tabel: lebar digit tetap agar tidak bergeser. */
+.purchase-lines tfoot th,
+.purchase-receive td,
+#purchaseTotal {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Halaman penempatan dan peminjaman aset: penekanan tombol kartu dan modal
+ * mengikuti pola halaman stok. Tombol aksi di dalam tabel tidak disertakan
+ * karena sudah diatur .table-actions.
+ */
+#btnAddAssignment,
+#btnAddLoan,
+#assignmentModal .modal-footer .btn,
+#assignmentReturnModal .modal-footer .btn,
+#loanModal .modal-footer .btn,
+#loanReturnModal .modal-footer .btn {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#btnAddAssignment:active,
+#btnAddLoan:active,
+#assignmentModal .modal-footer .btn:active,
+#assignmentReturnModal .modal-footer .btn:active,
+#loanModal .modal-footer .btn:active,
+#loanReturnModal .modal-footer .btn:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #btnAddAssignment,
+  #btnAddLoan,
+  #assignmentModal .modal-footer .btn,
+  #assignmentReturnModal .modal-footer .btn,
+  #loanModal .modal-footer .btn,
+  #loanReturnModal .modal-footer .btn {
+    transition: none;
+  }
+
+  #btnAddAssignment:active,
+  #btnAddLoan:active,
+  #assignmentModal .modal-footer .btn:active,
+  #assignmentReturnModal .modal-footer .btn:active,
+  #loanModal .modal-footer .btn:active,
+  #loanReturnModal .modal-footer .btn:active {
+    transform: none;
+  }
+}
+
+/*
+ * Halaman mutasi, pemeliharaan, dan penghapusan aset: penekanan tombol kartu
+ * serta modal mengikuti pola halaman penempatan/peminjaman. Tombol aksi di
+ * dalam tabel tidak disertakan karena sudah diatur oleh .table-actions.
+ */
+#btnAddTransfer,
+#btnAddMaintenance,
+#btnAddDisposal,
+#transferModal .modal-footer .btn,
+#transferCancelModal .modal-footer .btn,
+#maintenanceCompleteModal .modal-footer .btn {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#btnAddTransfer:active,
+#btnAddMaintenance:active,
+#btnAddDisposal:active,
+#transferModal .modal-footer .btn:active,
+#transferCancelModal .modal-footer .btn:active,
+#maintenanceCompleteModal .modal-footer .btn:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #btnAddTransfer,
+  #btnAddMaintenance,
+  #btnAddDisposal,
+  #transferModal .modal-footer .btn,
+  #transferCancelModal .modal-footer .btn,
+  #maintenanceCompleteModal .modal-footer .btn {
+    transition: none;
+  }
+
+  #btnAddTransfer:active,
+  #btnAddMaintenance:active,
+  #btnAddDisposal:active,
+  #transferModal .modal-footer .btn:active,
+  #transferCancelModal .modal-footer .btn:active,
+  #maintenanceCompleteModal .modal-footer .btn:active {
+    transform: none;
+  }
+}
+
+/* Kolom alasan dan catatan pada tabel mutasi serta penghapusan mengalir lebih rapi. */
+.text-wrap-pretty,
+.transfer-reason,
+.disposal-reason {
+  text-wrap: pretty;
+}
+
+/*
+ * Halaman laporan dan audit trail: penekanan tombol kartu mengikuti pola halaman
+ * stok. Tombol di dalam tabel tidak disertakan karena sudah diatur .table-actions.
+ */
+.report-actions .btn,
+#btnResetLogFilter {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.report-actions .btn:active,
+#btnResetLogFilter:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-actions .btn,
+  #btnResetLogFilter {
+    transition: none;
+  }
+
+  .report-actions .btn:active,
+  #btnResetLogFilter:active {
+    transform: none;
+  }
+}

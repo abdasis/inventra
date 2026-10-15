@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Inventra\Core\DTO;
 
+use Inventra\Core\Enums\AcquisitionSource;
 use Inventra\Core\Enums\AssetCondition;
 use Inventra\Core\Enums\AssetStatus;
 use InvalidArgumentException;
@@ -25,6 +26,13 @@ final readonly class AssetDTO
         public ?string $notes,
         public ?string $categoryName = null,
         public ?string $locationName = null,
+        public ?int $itemId = null,
+        public ?string $itemName = null,
+        public AcquisitionSource $acquisitionSource = AcquisitionSource::Purchase,
+        public ?string $purchaseReference = null,
+        public ?string $warrantyExpiry = null,
+        public ?string $photoPath = null,
+        public ?string $documentPath = null,
     ) {}
 
     /**
@@ -49,6 +57,12 @@ final readonly class AssetDTO
         $condStr = (string)($data['condition_level'] ?? 'good');
         $condition = AssetCondition::tryFrom($condStr) ?? AssetCondition::Good;
 
+        // Baris lama bisa saja belum punya sumber perolehan; defaultnya pembelian.
+        $sourceStr = (string)($data['acquisition_source'] ?? '');
+        $source = AcquisitionSource::tryFrom($sourceStr) ?? AcquisitionSource::Purchase;
+
+        $itemId = (int)($data['item_id'] ?? 0);
+
         return new self(
             id: isset($data['id']) ? (int)$data['id'] : null,
             assetCode: $code,
@@ -64,6 +78,13 @@ final readonly class AssetDTO
             notes: !empty($data['notes']) ? (string)$data['notes'] : null,
             categoryName: isset($data['category_name']) ? (string)$data['category_name'] : null,
             locationName: isset($data['location_name']) ? (string)$data['location_name'] : null,
+            itemId: $itemId > 0 ? $itemId : null,
+            itemName: isset($data['item_name']) ? (string)$data['item_name'] : null,
+            acquisitionSource: $source,
+            purchaseReference: !empty($data['purchase_reference']) ? (string)$data['purchase_reference'] : null,
+            warrantyExpiry: !empty($data['warranty_expiry']) ? (string)$data['warranty_expiry'] : null,
+            photoPath: !empty($data['photo_path']) ? (string)$data['photo_path'] : null,
+            documentPath: !empty($data['document_path']) ? (string)$data['document_path'] : null,
         );
     }
 
@@ -92,6 +113,14 @@ final readonly class AssetDTO
             'condition_badge' => $this->conditionLevel->badgeClass(),
             'assigned_to' => $this->assignedTo,
             'notes' => $this->notes,
+            'item_id' => $this->itemId,
+            'item_name' => $this->itemName,
+            'acquisition_source' => $this->acquisitionSource->value,
+            'acquisition_source_label' => $this->acquisitionSource->label(),
+            'purchase_reference' => $this->purchaseReference,
+            'warranty_expiry' => $this->warrantyExpiry,
+            'photo_path' => $this->photoPath,
+            'document_path' => $this->documentPath,
         ];
     }
 }

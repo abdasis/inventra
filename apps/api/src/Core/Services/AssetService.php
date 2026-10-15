@@ -10,8 +10,12 @@ use Inventra\Core\Actions\Asset\CreateAssetAction;
 use Inventra\Core\Actions\Asset\DeleteAssetAction;
 use Inventra\Core\Actions\Asset\UpdateAssetAction;
 use Inventra\Core\Database\Connection;
+use Inventra\Core\DTO\AssetDTO;
+use Inventra\Core\Enums\AssetCondition;
+use Inventra\Core\Enums\AssetStatus;
 use Inventra\Core\Repositories\AssetRepository;
 use Inventra\Core\Support\ActivityLogger;
+use Inventra\Core\Support\FieldChangeNarrator;
 
 /**
  * Orkestrasi use case aset: memanggil Action, memegang transaksi untuk use case
@@ -32,23 +36,46 @@ final class AssetService
     }
 
     /**
+     * Penulisan massal boleh menyentuh banyak baris sekaligus, jadi seluruh
+     * registrasi dipegang satu transaksi. Activity log ditulis setelah commit.
+     *
      * @param array<string, mixed> $payload
-     * @return array{message: string, data: array<string, mixed>}
+     * @return array{message: string, data: array<int, array<string, mixed>>, count: int}
      */
     public function create(array $payload): array
     {
-        $id = $this->createAsset->execute($payload);
-        $asset = $this->assets->find($id);
+        $result = Connection::transaction(fn (): array => $this->createAsset->execute($payload));
+
+        $rows = [];
+        foreach ($result['ids'] as $id) {
+            $row = $this->assets->find($id);
+            if ($row !== null) {
+                $rows[] = $row;
+            }
+        }
+
+        $name = (string)($rows[0]['name'] ?? '');
+        $firstCode = (string)($rows[0]['asset_code'] ?? $result['code']);
+        $lastCode = $rows === [] ? $result['code'] : (string)$rows[count($rows) - 1]['asset_code'];
+        $data = $this->presentMany($rows);
 
         ActivityLogger::log(
             'create',
-            'Menambahkan aset ' . $asset['name'] . ' (' . $asset['asset_code'] . ')',
+            $result['quantity'] > 1
+                ? 'Mendaftarkan ' . $result['quantity'] . ' unit aset ' . $name . ' (' . $firstCode . ' … ' . $lastCode . ')'
+                : 'Mendaftarkan aset ' . $name . ' (' . $firstCode . ')',
             'asset',
-            $id,
+            (int)($result['ids'][0] ?? 0),
             $this->ipAddress
         );
 
-        return ['message' => 'Aset berhasil didaftarkan', 'data' => $asset];
+        return [
+            'message' => $result['quantity'] > 1
+                ? $result['quantity'] . ' aset berhasil didaftarkan'
+                : 'Aset berhasil didaftarkan',
+            'data' => $data,
+            'count' => $result['quantity'],
+        ];
     }
 
     /**
@@ -57,18 +84,19 @@ final class AssetService
      */
     public function update(int $id, array $payload): array
     {
+        $before = $this->assets->find($id) ?? [];
         $this->updateAsset->execute($id, $payload);
         $asset = $this->assets->find($id);
 
         ActivityLogger::log(
             'update',
-            'Memperbarui data aset ' . $asset['name'] . ' (' . $asset['asset_code'] . ')',
+            'Memperbarui data aset ' . $asset['name'] . ' (' . $asset['asset_code'] . ')' . $this->fieldChanges($before, $asset),
             'asset',
             $id,
             $this->ipAddress
         );
 
-        return ['message' => 'Data aset berhasil diperbarui', 'data' => $asset];
+        return ['message' => 'Data aset berhasil diperbarui', 'data' => AssetDTO::fromArray($asset)->toArray()];
     }
 
     /**
@@ -127,5 +155,57 @@ final class AssetService
         );
 
         return ['message' => 'Pengembalian / checkin aset berhasil', 'data' => $updated];
+    }
+
+    /**
+     * Perubahan penting pada data aset, dinarasikan dengan label Indonesia:
+     * " — status berubah dari Tersedia menjadi Perbaikan".
+     *
+     * @param array<string, mixed> $before Baris sebelum update.
+     * @param array<string, mixed> $after Baris sesudah update.
+     */
+    private function fieldChanges(array $before, array $after): string
+    {
+        $labels = ['status' => 'status', 'condition' => 'kondisi fisik', 'location' => 'lokasi'];
+
+        return FieldChangeNarrator::describe(
+            [
+                'status' => $this->statusLabel($before['status'] ?? null),
+                'condition' => $this->conditionLabel($before['condition_level'] ?? null),
+                'location' => $before['location_name'] ?? null,
+            ],
+            [
+                'status' => $this->statusLabel($after['status'] ?? null),
+                'condition' => $this->conditionLabel($after['condition_level'] ?? null),
+                'location' => $after['location_name'] ?? null,
+            ],
+            $labels
+        );
+    }
+
+    private function statusLabel(mixed $value): string
+    {
+        $status = AssetStatus::tryFrom((string)$value);
+
+        return $status !== null ? $status->label() : (string)$value;
+    }
+
+    private function conditionLabel(mixed $value): string
+    {
+        $condition = AssetCondition::tryFrom((string)$value);
+
+        return $condition !== null ? $condition->label() : (string)$value;
+    }
+
+    /**
+     * Baris DB dipetakan lewat DTO supaya label status/kondisi/sumber perolehan
+     * dan format rupiah sampai ke klien; frontend tidak menghitungnya sendiri.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function presentMany(array $rows): array
+    {
+        return array_map(static fn (array $row): array => AssetDTO::fromArray($row)->toArray(), $rows);
     }
 }

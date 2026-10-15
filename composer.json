@@ -24,6 +24,17 @@
         "test": [
             "@php apps/api/tests/run_tests.php",
             "@php apps/api/tests/user_domain_check.php",
+            "@php apps/api/tests/master_reference_check.php",
+            "@php apps/api/tests/master_partner_check.php",
+            "@php apps/api/tests/asset_registration_check.php",
+            "@php apps/api/tests/procurement_check.php",
+            "@php apps/api/tests/stock_check.php",
+            "@php apps/api/tests/assignment_check.php",
+            "@php apps/api/tests/loan_check.php",
+            "@php apps/api/tests/transfer_check.php",
+            "@php apps/api/tests/maintenance_check.php",
+            "@php apps/api/tests/disposal_check.php",
+            "@php apps/api/tests/report_check.php",
             "@php apps/api/tests/contract_snapshot.php",
             "@php apps/web/tests/page_snapshot.php",
             "@php apps/web/tests/redirect_check.php"

@@ -100,7 +100,7 @@
           <th>Kondisi</th>
           <th>Status & Pemegang</th>
           <th class="text-end">Nilai (Rp)</th>
-          <th class="text-center" style="width: 140px;">Aksi</th>
+          <th class="text-center" style="width: 220px;">Aksi</th>
         </tr>
       </thead>
       <!-- Baris diisi DataTables lewat app.js; keadaan kosong ditangani DataTables. -->
