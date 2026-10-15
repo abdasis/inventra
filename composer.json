@@ -1,0 +1,31 @@
+{
+    "name": "inventra/monorepo",
+    "description": "Inventra - Modern Office Asset and Inventory Management System Monorepo",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3 || ^8.4 || ^8.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Inventra\\Core\\": "packages/core/src/",
+            "Inventra\\Api\\": "apps/api/src/",
+            "Inventra\\Web\\": "apps/web/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Inventra\\Tests\\": "packages/core/tests/"
+        }
+    },
+    "scripts": {
+        "test": "php packages/core/tests/run_tests.php"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

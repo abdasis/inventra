@@ -1,0 +1,9 @@
+# Inventra Git Ignore
+/vendor/
+.env
+*.log
+*.sqlite
+*.db
+.DS_Store
+.idea/
+.vscode/
